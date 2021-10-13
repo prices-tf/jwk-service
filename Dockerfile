@@ -25,9 +25,7 @@ RUN npm ci --no-audit
 
 COPY --from=builder /usr/app/dist ./dist
 
-ENV HOME $DATA_DIR
-
-VOLUME $DATA_DIR
+VOLUME ["/data"]
 
 EXPOSE 3000
 
