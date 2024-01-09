@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { generateKeyPair } from 'jose/util/generate_key_pair';
 import { fromKeyLike, JWK, KeyLike } from 'jose/jwk/from_key_like';
 import { JWTPayload, SignJWT } from 'jose/jwt/sign';
@@ -9,7 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { Redis, RedisOptions } from 'ioredis';
 
 @Injectable()
-export class JwkService {
+export class JwkService implements OnModuleDestroy {
   private readonly redis = this.newRedisClient();
 
   constructor(private readonly configService: ConfigService<Config>) {}
@@ -123,5 +123,10 @@ export class JwkService {
     }
 
     return new Redis(options);
+  }
+
+  async onModuleDestroy() {
+    // Close Redis client before stopping
+    await this.redis.quit();
   }
 }
